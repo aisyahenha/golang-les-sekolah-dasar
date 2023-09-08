@@ -14,3 +14,18 @@ select gen_random_uuid();'
   "username":"Jane Doe",
   "password":"jane"
 }
+
+git remote add origin https://github.com/aisyahenha/golang-les-sekolah-dasar.git
+git branch -M main
+git push -u origin main
+
+user
+CREATE harus isi username dan password, 
+nanti di tambah atau di test - UPDATE harus ngisi ID
+GET Password tidak keliatan
+
+
+nanti di mapping supaya upadate dan create tidak erlu nampilin pass dan DELETED AT
+role hanya admin dan user
+
+

@@ -16,6 +16,7 @@ type UserController struct {
 
 func (u *UserController) createHandler(c *gin.Context) {
 	var payload model.User
+	// var respon model.UserRespon 
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
@@ -24,7 +25,7 @@ func (u *UserController) createHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
-	c.JSON(http.StatusCreated, payload)
+	c.JSON(http.StatusCreated,payload)
 }
 func (u *UserController) listHandler(c *gin.Context) {
 	users, err := u.uc.FindAllUser()
@@ -32,6 +33,7 @@ func (u *UserController) listHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
+	// var respon model.UserRespon
 	c.JSON(http.StatusOK, gin.H{"data": users})
 }
 

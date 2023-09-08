@@ -10,8 +10,9 @@ import (
 
 type UserUseCase interface {
 	RegisterNewUser(payload *model.User) error
-	FindAllUser() ([]model.User, error)
-	FindByUserId(id string) (model.User, error)
+	FindAllUser() ([]model.UserRespon, error)
+	// FindAllUser() ([]model.User, error)
+	FindByUserId(id string) (model.UserRespon, error)
 	UpdateUser(payload *model.User) error
 	DeleteUser(id string) error
 }
@@ -26,12 +27,13 @@ func (u *userUseCase) DeleteUser(id string) error {
 }
 
 // FindAllUser implements UserUseCase.
-func (u *userUseCase) FindAllUser() ([]model.User, error) {
+func (u *userUseCase) FindAllUser() ([]model.UserRespon, error) {
+	// func (u *userUseCase) FindAllUser() ([]model.User, error) {
 	return u.repo.List()
 }
 
 // FindByUserId implements UserUseCase.
-func (u *userUseCase) FindByUserId(id string) (model.User, error) {
+func (u *userUseCase) FindByUserId(id string) (model.UserRespon, error) {
 	return u.repo.Get(id)
 }
 

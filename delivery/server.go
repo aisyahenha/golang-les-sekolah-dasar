@@ -5,19 +5,24 @@ import (
 
 	"github.com/aisyahenha/golang-les-sekolah-dasar/config"
 	"github.com/aisyahenha/golang-les-sekolah-dasar/delivery/controller"
+	"github.com/aisyahenha/golang-les-sekolah-dasar/delivery/middleware"
 	"github.com/aisyahenha/golang-les-sekolah-dasar/manager"
 	"github.com/aisyahenha/golang-les-sekolah-dasar/repository"
 	"github.com/aisyahenha/golang-les-sekolah-dasar/usecase"
+	loggerutil "github.com/aisyahenha/golang-les-sekolah-dasar/utils/logger_util"
 	"github.com/gin-gonic/gin"
 )
 
 type Server struct {
-	uc     usecase.UserUseCase
-	engine *gin.Engine
-	host   string
+	uc            usecase.UserUseCase
+	engine        *gin.Engine
+	host          string
+	loggerService loggerutil.LoggerUtil
 }
 
 func (s *Server) setupControllers() {
+	//manggil logger
+	s.engine.Use(middleware.NewLogMiddleware(s.loggerService).Logger())
 	// semua controller di taruh disini
 	controller.NewUserController(s.uc, s.engine)
 }
@@ -43,11 +48,13 @@ func NewServer() *Server {
 	ur := repository.NewUserRepository(infraManager.Conn())
 	uUc := usecase.NewUserUseCase(ur)
 	engine := gin.Default()
-	// localhost:8888/api/v1/users
+	loggerService := loggerutil.NewLoggerUtil(cfg.FileConfig)
+	
 	host := fmt.Sprintf("%s:%s", cfg.ApiHost, cfg.ApiPort)
 	return &Server{
 		uc:     uUc,
 		engine: engine,
 		host:   host,
+		loggerService: loggerService,
 	}
 }
