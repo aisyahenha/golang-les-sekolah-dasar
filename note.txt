@@ -1,0 +1,16 @@
+model - environment - utils - config - repository - usecase - controller - infra manager - server
+
+buat struct - buat interface - buat function - CTRL + . pada function untuk imlement interface
+run fungsi di postgree supaya bisa pake uuid:
+drop extension pgcrypto;
+CREATE EXTENSION pgcrypto;
+
+untuk cek sudah jadi atau belum:
+select gen_random_uuid();'
+
+
+{
+  "id":"1eb02090-9067-452a-acf2-a72f24fdab28",
+  "username":"Jane Doe",
+  "password":"jane"
+}
