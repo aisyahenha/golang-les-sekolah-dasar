@@ -1,3 +1,4 @@
 .env
 environment/*.env
 logger.log
+note.txt

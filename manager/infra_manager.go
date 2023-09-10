@@ -41,6 +41,10 @@ func (i *infraManager) initDb() error {
 		i.db = db.Debug()
 		if err := db.AutoMigrate(
 			&model.User{},
+			&model.CourseModel{},
+			&model.ScheduleModel{},
+			&model.StudentModel{},
+			&model.TeacherModel{}, 
 			
 		); err != nil {
 			return err

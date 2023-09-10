@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 
+	"github.com/aisyahenha/golang-les-sekolah-dasar/delivery/middleware"
 	"github.com/aisyahenha/golang-les-sekolah-dasar/model"
 	"github.com/aisyahenha/golang-les-sekolah-dasar/usecase"
 	"github.com/gin-gonic/gin"
@@ -10,8 +11,9 @@ import (
 )
 
 type TeacherController struct {
-	uc     usecase.TeacherUseCase
-	router *gin.Engine
+	uc             usecase.TeacherUseCase
+	router         *gin.Engine
+	authMiddleware middleware.AuthMiddleware
 }
 
 func (u *TeacherController) createHandler(c *gin.Context) {
@@ -68,17 +70,18 @@ func (u *TeacherController) deleteHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Teacher_id : " + id + " deleted!"})
 }
 
-func NewTeacherController(uc usecase.TeacherUseCase, r *gin.Engine) *TeacherController {
+func NewTeacherController(uc usecase.TeacherUseCase, r *gin.Engine, am middleware.AuthMiddleware) *TeacherController {
 	controller := &TeacherController{
 		uc:     uc,
 		router: r,
+		authMiddleware: am,
 	}
 	rg := r.Group("/api/v1")
-	rg.POST("/teachers", controller.createHandler)
-	rg.GET("/teachers", controller.listHandler)
-	rg.GET("/teachers/:id", controller.getHandler)
-	rg.PUT("/teachers", controller.updateHandler)
-	rg.DELETE("/teachers/:id", controller.deleteHandler)
+	rg.POST("/teachers", am.RequireToken("admin"), controller.createHandler)
+	rg.GET("/teachers", am.RequireToken("admin"), controller.listHandler)
+	rg.GET("/teachers/:id", am.RequireToken("admin"), controller.getHandler)
+	rg.PUT("/teachers", am.RequireToken("admin"), controller.updateHandler)
+	rg.DELETE("/teachers/:id", am.RequireToken("admin"), controller.deleteHandler)
 
 	return controller
 }

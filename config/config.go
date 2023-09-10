@@ -2,8 +2,11 @@ package config
 
 import (
 	"fmt"
+	"strconv"
+	"time"
 
 	"github.com/aisyahenha/golang-les-sekolah-dasar/utils"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type ApiConfig struct {
@@ -24,11 +27,18 @@ type FileConfig struct {
 	Env      string
 	FilePath string
 }
+type JwtConfig struct {
+	ApplicationName  string
+	JwtSignatureKey  []byte
+	JwtSigningMethod *jwt.SigningMethodHMAC
+	JwtLifeTime      time.Duration
+}
 
 type Config struct {
 	ApiConfig
 	DbConfig
 	FileConfig
+	JwtConfig
 }
 
 func (c *Config) ReadConfig() error {
@@ -55,8 +65,15 @@ func (c *Config) ReadConfig() error {
 	}
 
 	c.FileConfig = FileConfig{
-		Env:      vp.GetEnv("MIGRATION", "migration"),
+		Env:      vp.GetEnv("MIGRATION", "dev"),
 		FilePath: vp.GetEnv("FILE_PATH", "logger.log"),
+	}
+	jwtLifeTime, _ := strconv.Atoi(vp.GetEnv("TOKEN_EXPIRES", "5"))
+	c.JwtConfig = JwtConfig{
+		ApplicationName:  vp.GetEnv("TOKEN_NAME", "GOLANGLESSD"),
+		JwtSignatureKey:  []byte(vp.GetEnv("TOKEN_KEY", "1212312")),
+		JwtSigningMethod: jwt.SigningMethodHS256,
+		JwtLifeTime:      time.Duration(jwtLifeTime) * time.Minute,
 	}
 	if c.DbConfig.Host == "" || c.DbConfig.Port == "" ||
 		c.DbConfig.Name == "" || c.DbConfig.User == "" || c.DbConfig.Password == "" ||

@@ -29,3 +29,7 @@ nanti di mapping supaya upadate dan create tidak erlu nampilin pass dan DELETED 
 role hanya admin dan user
 
 
+untuk test:
+go test ./... -coverprofile=cover.out && go tool cover -html=cover.out
+
+yang bisa diakses user adalah: get all course 

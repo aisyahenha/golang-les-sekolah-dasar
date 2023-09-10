@@ -6,6 +6,7 @@ import (
 
 	"github.com/aisyahenha/golang-les-sekolah-dasar/model"
 	mappingutil "github.com/aisyahenha/golang-les-sekolah-dasar/utils/maping_util"
+	"golang.org/x/crypto/bcrypt"
 
 	"gorm.io/gorm"
 )
@@ -17,16 +18,42 @@ type UserRepository interface {
 	Get(id string) (model.UserRespon, error)
 	Update(payload *model.User) error
 	Delete(id string) error
+	GetByUsername(username string) (model.User, error)
+	GetByUsernamePassword(username string, password string) (model.User, error)
 }
 
 type userRepository struct {
 	db *gorm.DB
 }
 
+// GetByUsername implements UserRepository.
+func (u *userRepository) GetByUsername(username string) (model.User, error) {
+	var user model.User
+	result := u.db.Where("username = ?", username).First(&user).Error
+	if result != nil {
+		return model.User{}, result
+	}
+	return user, nil
+}
+
+// GetByUsernamePassword implements UserRepository.
+func (u *userRepository) GetByUsernamePassword(username string, password string) (model.User, error) {
+	user, err := u.GetByUsername(username)
+	if err != nil {
+		return model.User{}, err
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		return model.User{}, fmt.Errorf("failed to verify password hash : %v", err)
+	}
+	return user, nil
+
+}
+
 // Create implements UserRepository.
 func (u *userRepository) Create(payload *model.User) error {
 	result := u.db.Create(payload).Error
-	fmt.Print("sampeee createeee: ", result)
+	// fmt.Print("sampeee createeee: ", result)
 	return result
 }
 

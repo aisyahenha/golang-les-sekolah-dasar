@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 
+	"github.com/aisyahenha/golang-les-sekolah-dasar/delivery/middleware"
 	"github.com/aisyahenha/golang-les-sekolah-dasar/model"
 	"github.com/aisyahenha/golang-les-sekolah-dasar/usecase"
 	"github.com/gin-gonic/gin"
@@ -10,8 +11,9 @@ import (
 )
 
 type ScheduleController struct {
-	uc     usecase.ScheduleUseCase
-	router *gin.Engine
+	uc             usecase.ScheduleUseCase
+	router         *gin.Engine
+	authMiddleware middleware.AuthMiddleware
 }
 
 func (u *ScheduleController) createHandler(c *gin.Context) {
@@ -68,17 +70,18 @@ func (u *ScheduleController) deleteHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Schedule_id : " + id + " deleted!"})
 }
 
-func NewScheduleController(uc usecase.ScheduleUseCase, r *gin.Engine) *ScheduleController {
+func NewScheduleController(uc usecase.ScheduleUseCase, r *gin.Engine, am middleware.AuthMiddleware) *ScheduleController {
 	controller := &ScheduleController{
-		uc:     uc,
-		router: r,
+		uc:             uc,
+		router:         r,
+		authMiddleware: am,
 	}
 	rg := r.Group("/api/v1")
-	rg.POST("/schedules", controller.createHandler)
-	rg.GET("/schedules", controller.listHandler)
-	rg.GET("/schedules/:id", controller.getHandler)
-	rg.PUT("/schedules", controller.updateHandler)
-	rg.DELETE("/schedules/:id", controller.deleteHandler)
+	rg.POST("/schedules", am.RequireToken("admin"), controller.createHandler)
+	rg.GET("/schedules", am.RequireToken("*"), controller.listHandler)
+	rg.GET("/schedules/:id", am.RequireToken("admin"), controller.getHandler)
+	rg.PUT("/schedules", am.RequireToken("admin"), controller.updateHandler)
+	rg.DELETE("/schedules/:id", am.RequireToken("admin"), controller.deleteHandler)
 
 	return controller
 }
